@@ -4,6 +4,6 @@ RUN pip install nbt mcrcon prometheus_client requests
 
 COPY minecraft_exporter.py /
 
-EXPOSE 8001
+EXPOSE 8000
 
 ENTRYPOINT ["python","minecraft_exporter.py"]
