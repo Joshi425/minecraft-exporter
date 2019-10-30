@@ -58,6 +58,7 @@ dim_tps
 dim_ticktime
 overall_tps
 overall_ticktime
+player_online
 ```
 
 # Dashboards
