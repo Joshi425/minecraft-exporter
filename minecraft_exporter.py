@@ -51,8 +51,6 @@ class MinecraftCollector(object):
 
         # entites
         resp = mcr.command("forge entity list")
-        print("entites")
-        print(resp)
         entityregex = re.compile("(\d+): (.*?:.*?)\s")
         for entitycount, entityname in entityregex.findall(resp):
             entities.add_sample('entities',value=entitycount,labels={'entity':entityname})
