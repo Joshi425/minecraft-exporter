@@ -35,8 +35,11 @@ class MinecraftCollector(object):
         overall_tps      = Metric('overall_tps','overall TPS',"counter")
         overall_ticktime = Metric('overall_ticktime',"overall Ticktime","counter")
         player_online    = Metric('player_online',"is 1 if player is online","counter")
+        entities         = Metric('entities',"type and count of active entites", "counter")
         mcr = MCRcon(os.environ['RCON_HOST'],os.environ['RCON_PASSWORD'],port=int(os.environ['RCON_PORT']))
         mcr.connect()
+
+        # dimensions
         resp = mcr.command("forge tps")
         dimtpsregex = re.compile("Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)")
         for dimid, dimname, meanticktime, meantps in dimtpsregex.findall(resp):
@@ -45,13 +48,24 @@ class MinecraftCollector(object):
         overallregex = re.compile("Overall : Mean tick time: (.*) ms. Mean TPS: (.*)")
         overall_tps.add_sample('overall_tps',value=overallregex.findall(resp)[0][1],labels={})
         overall_ticktime.add_sample('overall_ticktime',value=overallregex.findall(resp)[0][0],labels={})
+
+        # entites
+        resp = mcr.command("forge entity list")
+        print("entites")
+        print(resp)
+        entityregex = re.compile("(\d+): (.*?:.*?)\s")
+        for entitycount, entityname in entityregex.findall(resp):
+            entities.add_sample('entities',value=entitycount,labels={'entity':entityname})
+
+        # player
         resp = mcr.command("list")
         playerregex = re.compile("There are \d*\/20 players online:(.*)")
         if playerregex.findall(resp):
             for player in playerregex.findall(resp)[0].split(","):
                 if player:
                     player_online.add_sample('player_online',value=1,labels={'player':player.lstrip()})
-        return[dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online]
+
+        return[dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities]
 
 
     def get_player_stats(self,uuid):
