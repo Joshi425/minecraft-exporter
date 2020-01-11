@@ -76,9 +76,9 @@ class MinecraftCollector(object):
             json_file.close()
         counter = 0
         for _, value in data['questProgress:9'].items():
-            for _, uuid in value['tasks:9']['0:10']['completeUsers:9'].items():
-                if uuid == player['uuid']:
-                    counter++
+            for _, u in value['tasks:9']['0:10']['completeUsers:9'].items():
+                if u == uuid:
+                    counter +=1
         return counter
 
     def get_player_stats(self,uuid):
@@ -99,7 +99,7 @@ class MinecraftCollector(object):
                     count += 1
         data["stat.advancements"] = count
         if self.questsEnabled:
-            data["quests_finished"] = get_player_quests_finished(uuid)
+            data["quests_finished"] = get_player_quests_finished(self,uuid)
         return data
 
     def update_metrics_for_player(self,uuid):
