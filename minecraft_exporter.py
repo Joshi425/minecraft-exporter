@@ -14,7 +14,11 @@ class MinecraftCollector(object):
         self.statsdirectory = "/world/stats"
         self.playerdirectory = "/world/playerdata"
         self.advancementsdirectory = "/world/advancements"
+        self.betterquesting = "/world/betterquesting"
         self.map = dict()
+        self.questsEnabled = False
+        if os.path.isdir(self.betterquesting):
+            self.questsEnabled = True
 
     def get_players(self):
         return [f[:-5] for f in listdir(self.statsdirectory) if isfile(join(self.statsdirectory, f))]
@@ -27,6 +31,7 @@ class MinecraftCollector(object):
             result = requests.get('https://api.mojang.com/user/profiles/'+uuid+'/names')
             self.map[uuid] = result.json()[0]['name']
             return(result.json()[0]['name'])
+
     def get_server_stats(self):
         if not all(x in os.environ for x in ['RCON_HOST','RCON_PASSWORD']):
             return []
@@ -65,6 +70,16 @@ class MinecraftCollector(object):
 
         return[dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities]
 
+    def get_player_quests_finished(self,uuid):
+        with open(self.betterquesting+"/QuestProgress.json") as json_file:
+            data = json.load(json_file)
+            json_file.close()
+        counter = 0
+        for _, value in data['questProgress:9'].items():
+            for _, u in value['tasks:9']['0:10']['completeUsers:9'].items():
+                if u == uuid:
+                    counter +=1
+        return counter
 
     def get_player_stats(self,uuid):
         with open(self.statsdirectory+"/"+uuid+".json") as json_file:
@@ -83,6 +98,8 @@ class MinecraftCollector(object):
                 if value["done"] == True: 
                     count += 1
         data["stat.advancements"] = count
+        if self.questsEnabled:
+            data["stat.questsFinished"] = self.get_player_quests_finished(uuid)
         return data
 
     def update_metrics_for_player(self,uuid):
@@ -105,6 +122,7 @@ class MinecraftCollector(object):
         player_playtime     = Metric('player_playtime',"Time in Minutes a Player was online","counter")
         player_advancements = Metric('player_advancements', "Number of completed advances of a player","counter")
         player_slept        = Metric('player_slept',"Times a Player slept in a bed","counter")
+        player_quests_finished = Metric('player_quests_finished', 'Number of quests a Player has finished', 'counter')
         player_used_crafting_table = Metric('player_used_crafting_table',"Times a Player used a Crafting Table","counter")
         for key, value in data.items():
             stat = key.split(".")[1] # entityKilledBy
@@ -163,7 +181,9 @@ class MinecraftCollector(object):
                 player_slept.add_sample('player_slept',value=value,labels={'player':name})
             elif stat == "craftingTableInteraction":
                 player_used_crafting_table.add_sample('player_used_crafting_table',value=value,labels={'player':name})
-        return [blocks_mined,blocks_picked_up,player_deaths,player_jumps,cm_traveled,player_xp_total,player_current_level,player_food_level,player_health,player_score,entities_killed,damage_taken,damage_dealt,blocks_crafted,player_playtime,player_advancements,player_slept,player_used_crafting_table]
+            elif stat == "questsFinished":
+                player_quests_finished.add_sample('player_quests_finished',value=value,labels={'player':name})
+        return [blocks_mined,blocks_picked_up,player_deaths,player_jumps,cm_traveled,player_xp_total,player_current_level,player_food_level,player_health,player_score,entities_killed,damage_taken,damage_dealt,blocks_crafted,player_playtime,player_advancements,player_slept,player_used_crafting_table,player_quests_finished]
 
     def collect(self):
         for player in self.get_players():
