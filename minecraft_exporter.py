@@ -75,7 +75,7 @@ class MinecraftCollector(object):
             data = json.load(json_file)
             json_file.close()
         counter = 0
-        for key, value in data['questProgress:9'].items():
+        for _, value in data['questProgress:9'].items():
             for _, uuid in value['tasks:9']['0:10']['completeUsers:9'].items():
                 if uuid == player['uuid']:
                     counter++
