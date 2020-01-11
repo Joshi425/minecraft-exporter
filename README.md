@@ -51,6 +51,7 @@ player_playtime
 player_advancements
 player_slept
 player_used_crafting_table
+player_quests_finished # support for betterquesting
 ```
 the following Metrics are only exported if RCON is configured:
 ```
