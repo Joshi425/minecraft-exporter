@@ -99,7 +99,7 @@ class MinecraftCollector(object):
                     count += 1
         data["stat.advancements"] = count
         if self.questsEnabled:
-            data["stat.quests_finished"] = self.get_player_quests_finished(uuid)
+            data["stat.questsFinished"] = self.get_player_quests_finished(uuid)
         return data
 
     def update_metrics_for_player(self,uuid):
