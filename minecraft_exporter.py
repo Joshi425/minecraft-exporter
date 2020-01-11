@@ -183,7 +183,7 @@ class MinecraftCollector(object):
                 player_used_crafting_table.add_sample('player_used_crafting_table',value=value,labels={'player':name})
             elif stat == "questsFinished":
                 player_quests_finished.add_sample('player_quests_finished',value=value,labels={'player':name})
-        return [blocks_mined,blocks_picked_up,player_deaths,player_jumps,cm_traveled,player_xp_total,player_current_level,player_food_level,player_health,player_score,entities_killed,damage_taken,damage_dealt,blocks_crafted,player_playtime,player_advancements,player_slept,player_used_crafting_table]
+        return [blocks_mined,blocks_picked_up,player_deaths,player_jumps,cm_traveled,player_xp_total,player_current_level,player_food_level,player_health,player_score,entities_killed,damage_taken,damage_dealt,blocks_crafted,player_playtime,player_advancements,player_slept,player_used_crafting_table,player_quests_finished]
 
     def collect(self):
         for player in self.get_players():
