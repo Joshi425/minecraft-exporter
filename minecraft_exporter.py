@@ -2,7 +2,7 @@ from prometheus_client import start_http_server, REGISTRY, Metric
 import time
 import requests
 import json
-import nbt 
+import nbt
 import re
 import os
 from mcrcon import MCRcon
@@ -26,7 +26,7 @@ class MinecraftCollector(object):
     def uuid_to_player(self,uuid):
         uuid = uuid.replace('-','')
         if uuid in self.map:
-            return self.map[uuid] 
+            return self.map[uuid]
         else:
             result = requests.get('https://api.mojang.com/user/profiles/'+uuid+'/names')
             self.map[uuid] = result.json()[0]['name']
@@ -50,7 +50,7 @@ class MinecraftCollector(object):
         for dimid, dimname, meanticktime, meantps in dimtpsregex.findall(resp):
             dim_tps.add_sample('dim_tps',value=meantps,labels={'dimension_id':dimid,'dimension_name':dimname})
             dim_ticktime.add_sample('dim_ticktime',value=meanticktime,labels={'dimension_id':dimid,'dimension_name':dimname})
-        overallregex = re.compile("Overall : Mean tick time: (.*) ms. Mean TPS: (.*)")
+        overallregex = re.compile("Overall\s?: Mean tick time: (.*) ms. Mean TPS: (.*)")
         overall_tps.add_sample('overall_tps',value=overallregex.findall(resp)[0][1],labels={})
         overall_ticktime.add_sample('overall_ticktime',value=overallregex.findall(resp)[0][0],labels={})
 
@@ -95,7 +95,9 @@ class MinecraftCollector(object):
             count = 0
             advancements = json.load(json_file)
             for key, value in advancements.items():
-                if value["done"] == True: 
+                if key in ("DataVersion"):
+                  continue
+                if value["done"] == True:
                     count += 1
         data["stat.advancements"] = count
         if self.questsEnabled:
@@ -125,6 +127,8 @@ class MinecraftCollector(object):
         player_quests_finished = Metric('player_quests_finished', 'Number of quests a Player has finished', 'counter')
         player_used_crafting_table = Metric('player_used_crafting_table',"Times a Player used a Crafting Table","counter")
         for key, value in data.items():
+            if key in ("stats", "DataVersion"):
+                continue
             stat = key.split(".")[1] # entityKilledBy
             if stat == "mineBlock":
                 blocks_mined.add_sample("blocks_mined",value=value,labels={'player':name,'block':'.'.join((key.split(".")[2],key.split(".")[3]))})

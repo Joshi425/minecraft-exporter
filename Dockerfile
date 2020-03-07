@@ -1,8 +1,7 @@
-from python:3
+FROM python:3-alpine
 
-RUN pip install nbt mcrcon prometheus_client requests 
-
-COPY minecraft_exporter.py /
+COPY requirements.txt minecraft_exporter.py /
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
 
