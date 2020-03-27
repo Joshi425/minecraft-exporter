@@ -54,6 +54,27 @@ class MinecraftCollector(object):
         overall_tps.add_sample('overall_tps',value=overallregex.findall(resp)[0][1],labels={})
         overall_ticktime.add_sample('overall_ticktime',value=overallregex.findall(resp)[0][0],labels={})
 
+        # dynmap
+        if os.environ['DYNMAP_ENABLED'] == "True":
+            dynmap_tile_render_statistics   = Metric('dynmap_tile_render_statistics','Tile Render Statistics reported by Dynmap',"counter")
+            dynmap_chunk_loading_statistics_count = Metric('dynmap_chunk_loading_statistics_count','Chunk Loading Statistics reported by Dynmap',"counter")
+            dynmap_chunk_loading_statistics_duration = Metric('dynmap_chunk_loading_statistics_duration','Chunk Loading Statistics reported by Dynmap',"counter")
+
+            resp = mcr.command("dynmap stats")
+
+            dynmaptilerenderregex = re.compile("  (.*?): processed=(\d*), rendered=(\d*), updated=(\d*)")
+            for dim, processed, rendered, updated in dynmaptilerenderregex.findall(resp):
+                dynmap_tile_render_statistics.add_sample('dynmap_tile_render_statistics',value=processed,labels={'type':'processed','file':dim})
+                dynmap_tile_render_statistics.add_sample('dynmap_tile_render_statistics',value=rendered,labels={'type':'rendered','file':dim})
+                dynmap_tile_render_statistics.add_sample('dynmap_tile_render_statistics',value=updated,labels={'type':'updated','file':dim})
+
+            dynmapchunkloadingregex = re.compile("Chunks processed: (.*?): count=(\d*), (\d*.\d*)")
+            for state, count, duration_per_chunk in dynmapchunkloadingregex.findall(resp):
+                dynmap_chunk_loading_statistics_count.add_sample('dynmap_chunk_loading_statistics',value=count,labels={'type': state})
+                dynmap_chunk_loading_statistics_duration.add_sample('dynmap_chunk_loading_duration',value=duration_per_chunk,labels={'type': state})
+
+
+
         # entites
         resp = mcr.command("forge entity list")
         entityregex = re.compile("(\d+): (.*?:.*?)\s")
@@ -68,7 +89,7 @@ class MinecraftCollector(object):
                 if player:
                     player_online.add_sample('player_online',value=1,labels={'player':player.lstrip()})
 
-        return[dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities]
+        return[dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities,dynmap_tile_render_statistics,dynmap_chunk_loading_statistics_count,dynmap_chunk_loading_statistics_duration]
 
     def get_player_quests_finished(self,uuid):
         with open(self.betterquesting+"/QuestProgress.json") as json_file:

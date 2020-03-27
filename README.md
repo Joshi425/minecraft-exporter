@@ -25,6 +25,7 @@ The RCON Module is only enabled if `RCON_HOST` and `RCON_PASSWORD` is set
 docker run -e RCON_HOST=127.0.0.1 \
 	   -e RCON_PORT=25575 \
 	   -e RCON_PASSWORD="Password" \
+	   -e DYNMAP_ENABLED="True" \
 	   -p 8000:8000 \
 	   -v /opt/all_the_mods_3/world:/world \
 	   joshi425/minecraft_exporter
@@ -60,6 +61,14 @@ dim_ticktime
 overall_tps
 overall_ticktime
 player_online
+```
+
+the following Metrics are exposed if Dynmap Support is enabled:
+
+```
+dynmap_tile_render_statistics
+dynmap_chunk_loading_statistics_count
+dynmap_chunk_loading_statistics_duration
 ```
 
 # Dashboards
