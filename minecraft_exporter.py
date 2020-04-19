@@ -33,6 +33,7 @@ class MinecraftCollector(object):
             return(result.json()[0]['name'])
 
     def get_server_stats(self):
+        metrics = []
         if not all(x in os.environ for x in ['RCON_HOST','RCON_PASSWORD']):
             return []
         dim_tps          = Metric('dim_tps','TPS of a dimension',"counter")
@@ -41,6 +42,9 @@ class MinecraftCollector(object):
         overall_ticktime = Metric('overall_ticktime',"overall Ticktime","counter")
         player_online    = Metric('player_online',"is 1 if player is online","counter")
         entities         = Metric('entities',"type and count of active entites", "counter")
+
+        metrics.extend([dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities])
+
         mcr = MCRcon(os.environ['RCON_HOST'],os.environ['RCON_PASSWORD'],port=int(os.environ['RCON_PORT']))
         mcr.connect()
 
@@ -59,6 +63,7 @@ class MinecraftCollector(object):
             dynmap_tile_render_statistics   = Metric('dynmap_tile_render_statistics','Tile Render Statistics reported by Dynmap',"counter")
             dynmap_chunk_loading_statistics_count = Metric('dynmap_chunk_loading_statistics_count','Chunk Loading Statistics reported by Dynmap',"counter")
             dynmap_chunk_loading_statistics_duration = Metric('dynmap_chunk_loading_statistics_duration','Chunk Loading Statistics reported by Dynmap',"counter")
+            metrics.extend([dynmap_tile_render_statistics,dynmap_chunk_loading_statistics_count,dynmap_chunk_loading_statistics_duration])
 
             resp = mcr.command("dynmap stats")
 
@@ -89,7 +94,7 @@ class MinecraftCollector(object):
                 if player:
                     player_online.add_sample('player_online',value=1,labels={'player':player.lstrip()})
 
-        return[dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities,dynmap_tile_render_statistics,dynmap_chunk_loading_statistics_count,dynmap_chunk_loading_statistics_duration]
+        return metrics
 
     def get_player_quests_finished(self,uuid):
         with open(self.betterquesting+"/QuestProgress.json") as json_file:
