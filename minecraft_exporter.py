@@ -5,6 +5,7 @@ import json
 import nbt
 import re
 import os
+import schedule
 from mcrcon import MCRcon
 from os import listdir
 from os.path import isfile, join
@@ -17,11 +18,18 @@ class MinecraftCollector(object):
         self.betterquesting = "/world/betterquesting"
         self.map = dict()
         self.questsEnabled = False
+        self.rcon = None
         if os.path.isdir(self.betterquesting):
             self.questsEnabled = True
+        schedule.every().day.at("01:00").do(self.flush_playernamecache)
 
     def get_players(self):
         return [f[:-5] for f in listdir(self.statsdirectory) if isfile(join(self.statsdirectory, f))]
+
+    def flush_playernamecache(self):
+        print("flushing playername cache")
+        self.map = dict()
+        return
 
     def uuid_to_player(self,uuid):
         uuid = uuid.replace('-','')
@@ -29,8 +37,21 @@ class MinecraftCollector(object):
             return self.map[uuid]
         else:
             result = requests.get('https://api.mojang.com/user/profiles/'+uuid+'/names')
-            self.map[uuid] = result.json()[0]['name']
-            return(result.json()[0]['name'])
+            self.map[uuid] = result.json()[-1]['name']
+            return(result.json()[-1]['name'])
+
+    def rcon_command(self,command):
+        if self.rcon == None:
+            self.rcon = MCRcon(os.environ['RCON_HOST'],os.environ['RCON_PASSWORD'],port=int(os.environ['RCON_PORT']))
+            self.rcon.connect()
+        try:
+            response = self.rcon.command(command)
+        except BrokenPipeError:
+            print("Lost RCON Connection, trying to reconnect")
+            self.rcon.connect()
+            response = self.rcon.command(command)
+
+        return response
 
     def get_server_stats(self):
         metrics = []
@@ -45,11 +66,9 @@ class MinecraftCollector(object):
 
         metrics.extend([dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities])
 
-        mcr = MCRcon(os.environ['RCON_HOST'],os.environ['RCON_PASSWORD'],port=int(os.environ['RCON_PORT']))
-        mcr.connect()
 
         # dimensions
-        resp = mcr.command("forge tps")
+        resp = self.rcon_command("forge tps")
         dimtpsregex = re.compile("Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)")
         for dimid, dimname, meanticktime, meantps in dimtpsregex.findall(resp):
             dim_tps.add_sample('dim_tps',value=meantps,labels={'dimension_id':dimid,'dimension_name':dimname})
@@ -59,13 +78,13 @@ class MinecraftCollector(object):
         overall_ticktime.add_sample('overall_ticktime',value=overallregex.findall(resp)[0][0],labels={})
 
         # dynmap
-        if os.environ['DYNMAP_ENABLED'] == "True":
+        if 'DYNMAP_ENABLED' in os.environ and os.environ['DYNMAP_ENABLED'] == "True":
             dynmap_tile_render_statistics   = Metric('dynmap_tile_render_statistics','Tile Render Statistics reported by Dynmap',"counter")
             dynmap_chunk_loading_statistics_count = Metric('dynmap_chunk_loading_statistics_count','Chunk Loading Statistics reported by Dynmap',"counter")
             dynmap_chunk_loading_statistics_duration = Metric('dynmap_chunk_loading_statistics_duration','Chunk Loading Statistics reported by Dynmap',"counter")
             metrics.extend([dynmap_tile_render_statistics,dynmap_chunk_loading_statistics_count,dynmap_chunk_loading_statistics_duration])
 
-            resp = mcr.command("dynmap stats")
+            resp = self.rcon_command("dynmap stats")
 
             dynmaptilerenderregex = re.compile("  (.*?): processed=(\d*), rendered=(\d*), updated=(\d*)")
             for dim, processed, rendered, updated in dynmaptilerenderregex.findall(resp):
@@ -81,13 +100,13 @@ class MinecraftCollector(object):
 
 
         # entites
-        resp = mcr.command("forge entity list")
+        resp = self.rcon_command("forge entity list")
         entityregex = re.compile("(\d+): (.*?:.*?)\s")
         for entitycount, entityname in entityregex.findall(resp):
             entities.add_sample('entities',value=entitycount,labels={'entity':entityname})
 
         # player
-        resp = mcr.command("list")
+        resp = self.rcon_command("list")
         playerregex = re.compile("There are \d*\/20 players online:(.*)")
         if playerregex.findall(resp):
             for player in playerregex.findall(resp)[0].split(","):
@@ -217,8 +236,10 @@ class MinecraftCollector(object):
 
     def collect(self):
         for player in self.get_players():
-            for metric in self.update_metrics_for_player(player)+self.get_server_stats():
+            for metric in self.update_metrics_for_player(player):
                 yield metric
+        for metric in self.get_server_stats():
+            yield metric
 
 
 if __name__ == '__main__':
@@ -230,3 +251,4 @@ if __name__ == '__main__':
     print("Exporter started on Port 8000")
     while True:
         time.sleep(1)
+        schedule.run_pending()
