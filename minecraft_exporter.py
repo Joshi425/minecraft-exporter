@@ -171,7 +171,8 @@ class MinecraftCollector(object):
         player_slept        = Metric('player_slept',"Times a Player slept in a bed","counter")
         player_quests_finished = Metric('player_quests_finished', 'Number of quests a Player has finished', 'counter')
         player_used_crafting_table = Metric('player_used_crafting_table',"Times a Player used a Crafting Table","counter")
-        for key, value in data.items():
+        mc_custom           = Metric('mc_custom',"Custom Minectaft stat","counter")
+        for key, value in data.items(): # pre 1.15
             if key in ("stats", "DataVersion"):
                 continue
             stat = key.split(".")[1] # entityKilledBy
@@ -232,7 +233,54 @@ class MinecraftCollector(object):
                 player_used_crafting_table.add_sample('player_used_crafting_table',value=value,labels={'player':name})
             elif stat == "questsFinished":
                 player_quests_finished.add_sample('player_quests_finished',value=value,labels={'player':name})
-        return [blocks_mined,blocks_picked_up,player_deaths,player_jumps,cm_traveled,player_xp_total,player_current_level,player_food_level,player_health,player_score,entities_killed,damage_taken,damage_dealt,blocks_crafted,player_playtime,player_advancements,player_slept,player_used_crafting_table,player_quests_finished]
+
+        if data["stats"]: # Minecraft > 1.15
+            for block, value in data["stats"]["minecraft:crafted"].items():
+                blocks_crafted.add_sample('blocks_crafted',value=value,labels={'player':name,'block':block})
+            for block, value in data["stats"]["minecraft:mined"].items():
+                blocks_mined.add_sample("blocks_mined",value=value,labels={'player':name,'block':block})
+            for block, value in data["stats"]["minecraft:picked_up"].items():
+                blocks_picked_up.add_sample("blocks_picked_up",value=value,labels={'player':name,'block':block})
+            for entity, value in data["stats"]["minecraft:killed"].items():
+                entities_killed.add_sample('entities_killed',value=value,labels={'player':name,"entity":entity})
+            for entity, value in data["stats"]["minecraft:killed_by"].items():
+                player_deaths.add_sample('player_deaths',value=value,labels={'player':name,'cause': entity})
+            for stat, value in data["stats"]["minecraft:custom"].items():
+                if stat == "minecraft:jump":
+                    player_jumps.add_sample("player_jumps",value=value,labels={'player':name})
+                elif stat == "minecraft:deaths":
+                    player_deaths.add_sample('player_deaths',value=value,labels={'player':name})
+                elif stat == "minecraft:damage_taken":
+                    damage_taken.add_sample('damage_taken',value=value,labels={'player':name})
+                elif stat == "minecraft:damage_dealt":
+                    damage_dealt.add_sample('damage_dealt',value=value,labels={'player':name})
+                elif stat == "minecraft:play_one_minute":
+                    player_playtime.add_sample('player_playtime',value=value,labels={'player':name})
+                elif stat == "minecraft:walk_one_cm":
+                    cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"walking"})
+                elif stat == "minecraft:walk_on_water_one_cm":
+                    cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"swimming"})
+                elif stat == "minecraft:sprint_one_cm":
+                    cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"sprinting"})
+                elif stat == "minecraft:walk_under_water_one_cm":
+                    cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"diving"})
+                elif stat == "minecraft:fall_one_cm":
+                    cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"falling"})
+                elif stat == "minecraft:fly_one_cm":
+                    cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"flying"})
+                elif stat == "minecraft:boat_one_cm":
+                    cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"boat"})
+                elif stat == "minecraft:horse_one_cm":
+                    cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"horse"})
+                elif stat == "minecraft:climb_one_cm":
+                    cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"climbing"})
+                elif stat == "minecraft:sleep_in_bed":
+                    player_slept.add_sample('player_slept',value=value,labels={'player':name})
+                elif stat == "minecraft:interact_with_crafting_table":
+                    player_used_crafting_table.add_sample('player_used_crafting_table',value=value,labels={'player':name})
+                else:
+                    mc_custom.add_sample('mc_custom',value=value,labels={'stat':stat})
+        return [blocks_mined,blocks_picked_up,player_deaths,player_jumps,cm_traveled,player_xp_total,player_current_level,player_food_level,player_health,player_score,entities_killed,damage_taken,damage_dealt,blocks_crafted,player_playtime,player_advancements,player_slept,player_used_crafting_table,player_quests_finished,mc_custom]
 
     def collect(self):
         for player in self.get_players():
