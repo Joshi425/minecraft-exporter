@@ -234,7 +234,7 @@ class MinecraftCollector(object):
             elif stat == "questsFinished":
                 player_quests_finished.add_sample('player_quests_finished',value=value,labels={'player':name})
 
-        if data["stats"]: # Minecraft > 1.15
+        if "stats" in data: # Minecraft > 1.15
             for block, value in data["stats"]["minecraft:crafted"].items():
                 blocks_crafted.add_sample('blocks_crafted',value=value,labels={'player':name,'block':block})
             for block, value in data["stats"]["minecraft:mined"].items():
