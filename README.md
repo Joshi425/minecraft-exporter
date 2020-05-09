@@ -5,7 +5,8 @@ This exporter reads minecrafts nbt files, the advancements files and can optiona
 
 to use it mount your world to /world in the container
 
-rcon connection only works on forge servers, it only executes `forge tps` to get tps and tick time informations
+rcon connection is used to get online Players 
+On Forge Servers enable FORGE_SERVER to get tps information
 
 to enable rcon on your minecraft server add the following to the server.properties file:
 
@@ -25,6 +26,7 @@ The RCON Module is only enabled if `RCON_HOST` and `RCON_PASSWORD` is set
 docker run -e RCON_HOST=127.0.0.1 \
 	   -e RCON_PORT=25575 \
 	   -e RCON_PASSWORD="Password" \
+	   -e FORGE_SERVER="True" \
 	   -e DYNMAP_ENABLED="True" \
 	   -p 8000:8000 \
 	   -v /opt/all_the_mods_3/world:/world \

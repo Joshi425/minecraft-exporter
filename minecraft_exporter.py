@@ -67,15 +67,22 @@ class MinecraftCollector(object):
         metrics.extend([dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities])
 
 
-        # dimensions
-        resp = self.rcon_command("forge tps")
-        dimtpsregex = re.compile("Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)")
-        for dimid, dimname, meanticktime, meantps in dimtpsregex.findall(resp):
-            dim_tps.add_sample('dim_tps',value=meantps,labels={'dimension_id':dimid,'dimension_name':dimname})
-            dim_ticktime.add_sample('dim_ticktime',value=meanticktime,labels={'dimension_id':dimid,'dimension_name':dimname})
-        overallregex = re.compile("Overall\s?: Mean tick time: (.*) ms. Mean TPS: (.*)")
-        overall_tps.add_sample('overall_tps',value=overallregex.findall(resp)[0][1],labels={})
-        overall_ticktime.add_sample('overall_ticktime',value=overallregex.findall(resp)[0][0],labels={})
+        if 'FORGE_SERVER' in os.environ and os.environ['FORGE_SERVER'] == "True":
+            # dimensions
+            resp = self.rcon_command("forge tps")
+            dimtpsregex = re.compile("Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)")
+            for dimid, dimname, meanticktime, meantps in dimtpsregex.findall(resp):
+                dim_tps.add_sample('dim_tps',value=meantps,labels={'dimension_id':dimid,'dimension_name':dimname})
+                dim_ticktime.add_sample('dim_ticktime',value=meanticktime,labels={'dimension_id':dimid,'dimension_name':dimname})
+            overallregex = re.compile("Overall\s?: Mean tick time: (.*) ms. Mean TPS: (.*)")
+            overall_tps.add_sample('overall_tps',value=overallregex.findall(resp)[0][1],labels={})
+            overall_ticktime.add_sample('overall_ticktime',value=overallregex.findall(resp)[0][0],labels={})
+
+            # entites
+            resp = self.rcon_command("forge entity list")
+            entityregex = re.compile("(\d+): (.*?:.*?)\s")
+            for entitycount, entityname in entityregex.findall(resp):
+                entities.add_sample('entities',value=entitycount,labels={'entity':entityname})
 
         # dynmap
         if 'DYNMAP_ENABLED' in os.environ and os.environ['DYNMAP_ENABLED'] == "True":
@@ -97,17 +104,9 @@ class MinecraftCollector(object):
                 dynmap_chunk_loading_statistics_count.add_sample('dynmap_chunk_loading_statistics',value=count,labels={'type': state})
                 dynmap_chunk_loading_statistics_duration.add_sample('dynmap_chunk_loading_duration',value=duration_per_chunk,labels={'type': state})
 
-
-
-        # entites
-        resp = self.rcon_command("forge entity list")
-        entityregex = re.compile("(\d+): (.*?:.*?)\s")
-        for entitycount, entityname in entityregex.findall(resp):
-            entities.add_sample('entities',value=entitycount,labels={'entity':entityname})
-
         # player
         resp = self.rcon_command("list")
-        playerregex = re.compile("There are \d*\/20 players online:(.*)")
+        playerregex = re.compile("players online:(.*)")
         if playerregex.findall(resp):
             for player in playerregex.findall(resp)[0].split(","):
                 if player:
