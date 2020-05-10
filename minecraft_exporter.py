@@ -234,16 +234,21 @@ class MinecraftCollector(object):
                 player_quests_finished.add_sample('player_quests_finished',value=value,labels={'player':name})
 
         if "stats" in data: # Minecraft > 1.15
-            for block, value in data["stats"]["minecraft:crafted"].items():
-                blocks_crafted.add_sample('blocks_crafted',value=value,labels={'player':name,'block':block})
-            for block, value in data["stats"]["minecraft:mined"].items():
-                blocks_mined.add_sample("blocks_mined",value=value,labels={'player':name,'block':block})
-            for block, value in data["stats"]["minecraft:picked_up"].items():
-                blocks_picked_up.add_sample("blocks_picked_up",value=value,labels={'player':name,'block':block})
-            for entity, value in data["stats"]["minecraft:killed"].items():
-                entities_killed.add_sample('entities_killed',value=value,labels={'player':name,"entity":entity})
-            for entity, value in data["stats"]["minecraft:killed_by"].items():
-                player_deaths.add_sample('player_deaths',value=value,labels={'player':name,'cause': entity})
+            if "minecraft:crafted" in data["stats"]:
+                for block, value in data["stats"]["minecraft:crafted"].items():
+                    blocks_crafted.add_sample('blocks_crafted',value=value,labels={'player':name,'block':block})
+            if "minecraft:mined" in data["stats"]:
+                for block, value in data["stats"]["minecraft:mined"].items():
+                    blocks_mined.add_sample("blocks_mined",value=value,labels={'player':name,'block':block})
+            if "minecraft:picked_up" in data["stats"]:
+                for block, value in data["stats"]["minecraft:picked_up"].items():
+                    blocks_picked_up.add_sample("blocks_picked_up",value=value,labels={'player':name,'block':block})
+            if "minecraft:killed" in data["stats"]:
+                for entity, value in data["stats"]["minecraft:killed"].items():
+                    entities_killed.add_sample('entities_killed',value=value,labels={'player':name,"entity":entity})
+            if "minecraft:killed_by" in data["stats"]:
+                for entity, value in data["stats"]["minecraft:killed_by"].items():
+                    player_deaths.add_sample('player_deaths',value=value,labels={'player':name,'cause': entity})
             for stat, value in data["stats"]["minecraft:custom"].items():
                 if stat == "minecraft:jump":
                     player_jumps.add_sample("player_jumps",value=value,labels={'player':name})
