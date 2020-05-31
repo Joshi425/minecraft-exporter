@@ -109,7 +109,7 @@ class MinecraftCollector(object):
         playerregex = re.compile("players online:(.*)")
         if playerregex.findall(resp):
             for player in playerregex.findall(resp)[0].split(","):
-                if player and player != "":
+                if not player.isspace():
                     player_online.add_sample('player_online',value=1,labels={'player':player.lstrip()})
 
         return metrics
