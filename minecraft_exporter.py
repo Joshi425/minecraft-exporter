@@ -1,4 +1,3 @@
-from prometheus_client import start_http_server, REGISTRY, Metric
 import time
 import requests
 import json
@@ -9,7 +8,7 @@ import schedule
 from mcrcon import MCRcon
 from os import listdir
 from os.path import isfile, join
-
+from prometheus_client import start_http_server, REGISTRY, Metric
 class MinecraftCollector(object):
     def __init__(self):
         self.statsdirectory = "/world/stats"
@@ -36,9 +35,12 @@ class MinecraftCollector(object):
         if uuid in self.map:
             return self.map[uuid]
         else:
-            result = requests.get('https://api.mojang.com/user/profiles/'+uuid+'/names')
-            self.map[uuid] = result.json()[-1]['name']
-            return(result.json()[-1]['name'])
+            try:
+                result = requests.get('https://api.mojang.com/user/profiles/' + uuid + '/names')
+                self.map[uuid] = result.json()[-1]['name']
+                return(result.json()[-1]['name'])
+            except:
+                return False
 
     def rcon_command(self,command):
         if self.rcon == None:
@@ -149,8 +151,11 @@ class MinecraftCollector(object):
         return data
 
     def update_metrics_for_player(self,uuid):
-        data = self.get_player_stats(uuid)
         name = self.uuid_to_player(uuid)
+        if not name: return
+
+        data = self.get_player_stats(uuid)
+
         blocks_mined        = Metric('blocks_mined','Blocks a Player mined',"counter")
         blocks_picked_up    = Metric('blocks_picked_up','Blocks a Player picked up',"counter")
         player_deaths       = Metric('player_deaths','How often a Player died',"counter")
@@ -288,11 +293,14 @@ class MinecraftCollector(object):
 
     def collect(self):
         for player in self.get_players():
-            for metric in self.update_metrics_for_player(player):
+            metrics = self.update_metrics_for_player(player)
+            if not metrics: continue
+
+            for metric in metrics:
                 yield metric
+
         for metric in self.get_server_stats():
             yield metric
-
 
 if __name__ == '__main__':
     if all(x in os.environ for x in ['RCON_HOST','RCON_PASSWORD']):
@@ -300,7 +308,7 @@ if __name__ == '__main__':
 
     start_http_server(8000)
     REGISTRY.register(MinecraftCollector())
-    print("Exporter started on Port 8000")
+    print("\nExporter started on Port 8000\n")
     while True:
         time.sleep(1)
         schedule.run_pending()
