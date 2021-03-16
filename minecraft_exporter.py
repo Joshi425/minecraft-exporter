@@ -1,3 +1,4 @@
+from prometheus_client import start_http_server, REGISTRY, Metric
 import time
 import requests
 import json
@@ -8,7 +9,6 @@ import schedule
 from mcrcon import MCRcon
 from os import listdir
 from os.path import isfile, join
-from prometheus_client import start_http_server, REGISTRY, Metric
 class MinecraftCollector(object):
     def __init__(self):
         self.statsdirectory = "/world/stats"
@@ -40,7 +40,7 @@ class MinecraftCollector(object):
                 self.map[uuid] = result.json()[-1]['name']
                 return(result.json()[-1]['name'])
             except:
-                return False
+                return
 
     def rcon_command(self,command):
         if self.rcon == None:
@@ -308,7 +308,7 @@ if __name__ == '__main__':
 
     start_http_server(8000)
     REGISTRY.register(MinecraftCollector())
-    print("\nExporter started on Port 8000\n")
+    print("Exporter started on Port 8000")
     while True:
         time.sleep(1)
         schedule.run_pending()
