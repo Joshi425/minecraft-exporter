@@ -65,10 +65,19 @@ class MinecraftCollector(object):
         overall_ticktime = Metric('overall_ticktime',"overall Ticktime","counter")
         player_online    = Metric('player_online',"is 1 if player is online","counter")
         entities         = Metric('entities',"type and count of active entites", "counter")
+        tps_1m           = Metric('paper_tps_1m','1 Minute TPS',"counter")
+        tps_5m           = Metric('paper_tps_5m','5 Minute TPS',"counter")
+        tps_15m          = Metric('paper_tps_15m','15 Minute TPS',"counter")
 
-        metrics.extend([dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities])
-
-
+        metrics.extend([dim_tps,dim_ticktime,overall_tps,overall_ticktime,player_online,entities,tps_1m,tps_5m,tps_15m])
+        if 'PAPER_SERVER' in os.environ and os.environ['PAPER_SERVER'] == "True":
+            resp = str(self.rcon_command("tps")).strip().replace("§a","")
+            tpsregex = re.compile("TPS from last 1m, 5m, 15m: (\d*\.\d*), (\d*\.\d*), (\d*\.\d*)")
+            for m1,m5,m15 in tpsregex.findall(resp):
+                self.rcon_command("say "+str(m1))
+                tps_1m.add_sample('paper_tps_1m',value=m1,labels={'tps':'1m'})
+                tps_5m.add_sample('paper_tps_5m',value=m5,labels={'tps':'5m'})
+                tps_15m.add_sample('paper_tps_15m',value=m15,labels={'tps':'15m'})
         if 'FORGE_SERVER' in os.environ and os.environ['FORGE_SERVER'] == "True":
             # dimensions
             resp = self.rcon_command("forge tps")
