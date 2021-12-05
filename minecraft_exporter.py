@@ -74,7 +74,6 @@ class MinecraftCollector(object):
             resp = str(self.rcon_command("tps")).strip().replace("§a","")
             tpsregex = re.compile("TPS from last 1m, 5m, 15m: (\d*\.\d*), (\d*\.\d*), (\d*\.\d*)")
             for m1,m5,m15 in tpsregex.findall(resp):
-                self.rcon_command("say "+str(m1))
                 tps_1m.add_sample('paper_tps_1m',value=m1,labels={'tps':'1m'})
                 tps_5m.add_sample('paper_tps_5m',value=m5,labels={'tps':'5m'})
                 tps_15m.add_sample('paper_tps_15m',value=m15,labels={'tps':'15m'})
