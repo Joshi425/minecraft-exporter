@@ -6,7 +6,7 @@ This exporter reads minecrafts nbt files, the advancements files and can optiona
 to use it mount your world to /world in the container
 
 rcon connection is used to get online Players 
-On Forge Servers enable FORGE_SERVER to get tps information
+On Forge Servers enable FORGE_SERVER to get tps information   
 On Paper Servers enable PAPER_SERVER to get tps information
 
 to enable rcon on your minecraft server add the following to the server.properties file:
