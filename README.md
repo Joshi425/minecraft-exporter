@@ -7,6 +7,7 @@ to use it mount your world to /world in the container
 
 rcon connection is used to get online Players 
 On Forge Servers enable FORGE_SERVER to get tps information
+On Paper Servers enable PAPER_SERVER to get tps information
 
 to enable rcon on your minecraft server add the following to the server.properties file:
 
@@ -27,6 +28,7 @@ docker run -e RCON_HOST=127.0.0.1 \
 	   -e RCON_PORT=25575 \
 	   -e RCON_PASSWORD="Password" \
 	   -e FORGE_SERVER="True" \
+	   -e PAPER_SERVER="True" \
 	   -e DYNMAP_ENABLED="True" \
 	   -p 8000:8000 \
 	   -v /opt/all_the_mods_3/world:/world \
@@ -72,6 +74,14 @@ the following Metrics are exposed if Dynmap Support is enabled:
 dynmap_tile_render_statistics
 dynmap_chunk_loading_statistics_count
 dynmap_chunk_loading_statistics_duration
+```
+
+the following Metrics are exposed if PAPER_SERVER is enabled:
+```
+tps_1m 
+tps_5m 
+tps_15m
+
 ```
 
 # Dashboards
