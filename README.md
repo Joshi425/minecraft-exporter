@@ -1,11 +1,11 @@
 # minecraft-exporter
 
-this is a prometheus minecraft exporter
+this is a prometheus minecraft exporter   
 This exporter reads minecrafts nbt files, the advancements files and can optionally connect via RCON to your minecraft server.
 
 to use it mount your world to /world in the container
 
-rcon connection is used to get online Players 
+rcon connection is used to get online Players   
 On Forge Servers enable FORGE_SERVER to get tps information   
 On Paper Servers enable PAPER_SERVER to get tps information
 
