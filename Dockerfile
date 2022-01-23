@@ -5,4 +5,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
 
-ENTRYPOINT ["python","minecraft_exporter.py"]
+ENTRYPOINT ["python","-u","minecraft_exporter.py"]

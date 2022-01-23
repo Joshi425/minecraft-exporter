@@ -62,13 +62,23 @@ class MinecraftCollector(object):
             print(e)
         return False
 
+    def rcon_disconnect(self):
+        self.rcon.disconnect()
+        self.rcon_connected = False
+
     def rcon_command(self, command):
         try:
             response = self.rcon.command(command)
-        except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError, MCRconException):
+        except MCRconException as e:
+            response = None
+            if e == "Connection timeout error":
+                print("Lost RCON Connection")
+                self.rcon_disconnect()
+            else:
+                print("RCON command failed")
+        except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
             print("Lost RCON Connection")
-            self.rcon.disconnect()
-            self.rcon_connected = False
+            self.rcon_disconnect()
             response = None
 
         return response
@@ -359,9 +369,14 @@ class MinecraftCollector(object):
 
 
 if __name__ == '__main__':
+    collector = MinecraftCollector()
     start_http_server(8000)
-    REGISTRY.register(MinecraftCollector())
+    REGISTRY.register(collector)
     print("Exporter started on Port 8000")
     while True:
-        time.sleep(1)
-        schedule.run_pending()
+        try:
+            time.sleep(1)
+            schedule.run_pending()
+        except MCRconException:
+            # RCON timeout
+            collector.rcon_disconnect()
