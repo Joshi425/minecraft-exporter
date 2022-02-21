@@ -1,15 +1,16 @@
 # minecraft-exporter
 
-this is a prometheus minecraft exporter   
+This is a prometheus minecraft exporter
+
 This exporter reads minecrafts nbt files, the advancements files and can optionally connect via RCON to your minecraft server.
 
-to use it mount your world to /world in the container
+To use it mount your world to /world in the container
 
-rcon connection is used to get online Players   
+RCON connection is used to get online Players   
 On Forge Servers enable FORGE_SERVER to get tps information   
 On Paper Servers enable PAPER_SERVER to get tps information
 
-to enable rcon on your minecraft server add the following to the server.properties file:
+To enable rcon on your minecraft server add the following to the server.properties file:
 
 ```
 broadcast-rcon-to-ops=false
@@ -18,8 +19,22 @@ rcon.password=Password
 enable-rcon=true
 ```
 
-The RCON Module is only enabled if `RCON_HOST` and `RCON_PASSWORD` is set
+> Note: Broadcast RCON to ops is disabled, to avoid ops receiving spam whilst ingame.
 
+---
+
+# Environment Variables
+
+| Name          | Default | Description                                       |
+| ------------- | ------- | ------------------------------------------------- |
+| RCON_HOST     | `None`  | Host of the RCON server                           |
+| RCON_PORT     | `None`  | Port RCON is hosted on                            |
+| RCON_PASSWORD | `None`  | RCON Password for access                          |
+| HTTP_PORT     | `8000`  | Port to host on, in case of using outside docker* |
+
+> * Or other cases where you have limited control of port mappings, eg Pterodactyl.
+
+---
 
 # Usage
 
@@ -59,7 +74,9 @@ player_used_crafting_table
 player_quests_finished # support for betterquesting
 mc_custom # for 1.15
 ```
-the following Metrics are only exported if RCON is configured:
+
+The following Metrics are only exported if RCON is configured:
+
 ```
 dim_tps
 dim_ticktime
@@ -68,7 +85,7 @@ overall_ticktime
 player_online
 ```
 
-the following Metrics are exposed if Dynmap Support is enabled:
+The following Metrics are exposed if Dynmap Support is enabled:
 
 ```
 dynmap_tile_render_statistics
@@ -76,7 +93,7 @@ dynmap_chunk_loading_statistics_count
 dynmap_chunk_loading_statistics_duration
 ```
 
-the following Metrics are exposed if PAPER_SERVER is enabled:
+The following Metrics are exposed if PAPER_SERVER is enabled:
 ```
 tps_1m 
 tps_5m 

@@ -314,9 +314,15 @@ if __name__ == '__main__':
     if all(x in os.environ for x in ['RCON_HOST','RCON_PASSWORD']):
         print("RCON is enabled for "+ os.environ['RCON_HOST'])
 
-    start_http_server(8000)
+    HTTP_PORT = int(os.environ.get('HTTP_PORT'))
+    if  HTTP_PORT == None:
+        HTTP_PORT = 8000
+
+    start_http_server(HTTP_PORT)
     REGISTRY.register(MinecraftCollector())
-    print("Exporter started on Port 8000")
+
+    print(f'Exporter started on Port {HTTP_PORT}')
+
     while True:
         time.sleep(1)
         schedule.run_pending()
