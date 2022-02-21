@@ -314,7 +314,7 @@ if __name__ == '__main__':
     if all(x in os.environ for x in ['RCON_HOST','RCON_PASSWORD']):
         print("RCON is enabled for "+ os.environ['RCON_HOST'])
 
-    HTTP_PORT = os.environ.get('HTTP_PORT')
+    HTTP_PORT = int(os.environ.get('HTTP_PORT'))
     if  HTTP_PORT == None:
         HTTP_PORT = 8000
 
