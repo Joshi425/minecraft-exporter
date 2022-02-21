@@ -273,6 +273,8 @@ class MinecraftCollector(object):
                     damage_dealt.add_sample('damage_dealt',value=value,labels={'player':name})
                 elif stat == "minecraft:play_time":
                     player_playtime.add_sample('player_playtime',value=value,labels={'player':name})
+                elif stat == "minecraft:play_one_minute": # pre 1.17
+                    player_playtime.add_sample('player_playtime',value=value,labels={'player':name})
                 elif stat == "minecraft:walk_one_cm":
                     cm_traveled.add_sample("cm_traveled",value=value,labels={'player':name,'method':"walking"})
                 elif stat == "minecraft:walk_on_water_one_cm":
