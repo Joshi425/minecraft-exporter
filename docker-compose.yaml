@@ -1,7 +1,8 @@
 version: '3.1'
 services:
   minecraft-exporter:
-    image: 'joshi425/minecraft_exporter'
+    build:
+      context: .
     environment:
       RCON_HOST: 
       RCON_PORT:
@@ -9,4 +10,4 @@ services:
     ports:
     - 9700:8000
     volumes:
-    - /path/to/minecraft/world:/world:ro
+    - ./world:/world:ro
