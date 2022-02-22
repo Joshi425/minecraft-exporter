@@ -18,7 +18,7 @@
     "startup": "python3 minecraft_exporter.py",
     "config": {
         "files": "{}",
-        "startup": "{\r\n    \"done\": \"Startup complete\"\r\n}",
+        "startup": "{\r\n    \"done\": \"Exporter started on Port\"\r\n}",
         "logs": "{}",
         "stop": "^C"
     },
