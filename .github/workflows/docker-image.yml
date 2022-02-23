@@ -21,7 +21,7 @@ jobs:
       uses: elgohr/Publish-Docker-Github-Action@3.04
       with:
         # The name of the image you would like to push
-        name: surdaft/minecraft-exporter
+        name: ${{ github.actor }}/minecraft-exporter
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         registry: ghcr.io
