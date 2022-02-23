@@ -322,9 +322,11 @@ class MinecraftCollector(object):
                 elif stat == "minecraft:damage_taken":
                     damage_taken.add_sample('damage_taken', value=value, labels={'player': name})
                 elif stat == "minecraft:damage_dealt":
-                    damage_dealt.add_sample('damage_dealt', value=value, labels={'player': name})
-                elif stat == "minecraft:play_one_minute":
-                    player_playtime.add_sample('player_playtime', value=value, labels={'player': name})
+                    damage_dealt.add_sample('damage_dealt',value=value,labels={'player':name})
+                elif stat == "minecraft:play_time":
+                    player_playtime.add_sample('player_playtime',value=value,labels={'player':name})
+                elif stat == "minecraft:play_one_minute": # pre 1.17
+                    player_playtime.add_sample('player_playtime',value=value,labels={'player':name})
                 elif stat == "minecraft:walk_one_cm":
                     cm_traveled.add_sample("cm_traveled", value=value, labels={'player': name, 'method': "walking"})
                 elif stat == "minecraft:walk_on_water_one_cm":
@@ -368,11 +370,15 @@ class MinecraftCollector(object):
             yield metric
 
 
-if __name__ == '__main__':
-    collector = MinecraftCollector()
-    start_http_server(8000)
-    REGISTRY.register(collector)
-    print("Exporter started on Port 8000")
+    HTTP_PORT = int(os.environ.get('HTTP_PORT'))
+    if  HTTP_PORT == None:
+        HTTP_PORT = 8000
+
+    start_http_server(HTTP_PORT)
+    REGISTRY.register(MinecraftCollector())
+
+    print(f'Exporter started on Port {HTTP_PORT}')
+
     while True:
         try:
             time.sleep(1)
