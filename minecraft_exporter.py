@@ -370,8 +370,10 @@ class MinecraftCollector(object):
             yield metric
 
 
-    HTTP_PORT = int(os.environ.get('HTTP_PORT'))
-    if  HTTP_PORT == None:
+if __name__ == '__main__':
+    try:
+        HTTP_PORT = int(os.environ.get('HTTP_PORT'))
+    except:
         HTTP_PORT = 8000
 
     start_http_server(HTTP_PORT)
