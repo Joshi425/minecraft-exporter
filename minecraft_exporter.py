@@ -40,14 +40,13 @@ class MinecraftCollector(object):
         self.player_map = dict()
 
     def uuid_to_player(self, uuid):
-        uuid = uuid.replace('-', '')
         if uuid in self.player_map:
             return self.player_map[uuid]
         else:
             try:
-                result = requests.get('https://api.mojang.com/user/profiles/' + uuid + '/names')
-                self.player_map[uuid] = result.json()[-1]['name']
-                return (result.json()[-1]['name'])
+                result = requests.get('https://sessionserver.mojang.com/session/minecraft/profile/' + uuid)
+                self.player_map[uuid] = result.json()['name']
+                return (result.json()['name'])
             except:
                 return
 
