@@ -14,10 +14,11 @@ from prometheus_client import Metric, REGISTRY, start_http_server
 
 class MinecraftCollector(object):
     def __init__(self):
-        self.stats_directory = "/world/stats"
-        self.player_directory = "/world/playerdata"
-        self.advancements_directory = "/world/advancements"
-        self.better_questing = "/world/betterquesting"
+        self.world_directory = os.environ.get("WORLD_DIRECTORY", "/world")
+        self.stats_directory = self.world_directory + "/stats"
+        self.player_directory = self.world_directory + "/playerdata"
+        self.advancements_directory = self.world_directory + "/advancements"
+        self.better_questing = self.world_directory + "/betterquesting"
         self.player_map = dict()
         self.quests_enabled = False
 
