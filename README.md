@@ -43,9 +43,9 @@ docker run
        -e RCON_HOST=127.0.0.1                                  \
        -e RCON_PORT=25575                                      \
        -e RCON_PASSWORD="Password"                             \
-       -e FORGE_SERVER="True"                                  \
-       -e PAPER_SERVER="True"                                  \
-       -e DYNMAP_ENABLED="True"                                \
+       -e FORGE_SERVER="true"                                  \
+       -e PAPER_SERVER="true"                                  \
+       -e DYNMAP_ENABLED="true"                                \
        -p 8000:8000                                            \
        -v /path/to/minecraft/world:/world                      \
        ghcr.io/heathcliff26/grafana-minecraft-exporter:main
