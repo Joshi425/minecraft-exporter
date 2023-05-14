@@ -100,14 +100,14 @@ class MinecraftCollector(object):
 
         metrics.extend(
             [dim_tps, dim_ticktime, overall_tps, overall_ticktime, player_online, entities, tps_1m, tps_5m, tps_15m])
-        if 'PAPER_SERVER' in os.environ and os.environ['PAPER_SERVER'] == "True":
+        if 'PAPER_SERVER' in os.environ and os.environ['PAPER_SERVER'].lower() == "true":
             resp = str(self.rcon_command("tps")).strip().replace("§a", "")
             tpsregex = re.compile("TPS from last 1m, 5m, 15m: (\d*\.\d*), (\d*\.\d*), (\d*\.\d*)")
             for m1, m5, m15 in tpsregex.findall(resp):
                 tps_1m.add_sample('paper_tps_1m', value=m1, labels={'tps': '1m'})
                 tps_5m.add_sample('paper_tps_5m', value=m5, labels={'tps': '5m'})
                 tps_15m.add_sample('paper_tps_15m', value=m15, labels={'tps': '15m'})
-        if 'FORGE_SERVER' in os.environ and os.environ['FORGE_SERVER'] == "True":
+        if 'FORGE_SERVER' in os.environ and os.environ['FORGE_SERVER'].lower() == "true":
             # dimensions
             resp = self.rcon_command("forge tps")
             dimtpsregex = re.compile("Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)")
@@ -126,7 +126,7 @@ class MinecraftCollector(object):
                 entities.add_sample('entities', value=entitycount, labels={'entity': entityname})
 
         # dynmap
-        if 'DYNMAP_ENABLED' in os.environ and os.environ['DYNMAP_ENABLED'] == "True":
+        if 'DYNMAP_ENABLED' in os.environ and os.environ['DYNMAP_ENABLED'].lower() == "true":
             dynmap_tile_render_statistics = Metric('dynmap_tile_render_statistics',
                                                    'Tile Render Statistics reported by Dynmap', "counter")
             dynmap_chunk_loading_statistics_count = Metric('dynmap_chunk_loading_statistics_count',
