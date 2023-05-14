@@ -108,7 +108,7 @@
       ],
       "targets": [
         {
-          "expr": "player_online",
+          "expr": "minecraft_player_online",
           "instant": true,
           "legendFormat": "{{player}}",
           "refId": "A"
@@ -170,7 +170,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "exemplar": true,
-          "expr": "dim_ticktime",
+          "expr": "forge_dim_ticktime",
           "interval": "",
           "legendFormat": "{{dimension_name}}",
           "refId": "A"
@@ -180,7 +180,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "overall_ticktime",
+          "expr": "forge_overall_ticktime",
           "legendFormat": "Overall",
           "refId": "B"
         }
@@ -268,12 +268,12 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "dim_tps",
+          "expr": "forge_dim_tps",
           "legendFormat": "{{ dimension_name }}",
           "refId": "A"
         },
         {
-          "expr": "overall_tps",
+          "expr": "forge_overall_tps",
           "legendFormat": "Overall",
           "refId": "B"
         }
@@ -481,7 +481,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "entities",
+          "expr": "forge_entities",
           "legendFormat": "{{ entity }}",
           "refId": "A"
         }
@@ -567,7 +567,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "player_playtime / 20",
+          "expr": "minecraft_player_playtime / 20",
           "legendFormat": "{{ player }}",
           "refId": "A"
         }
@@ -739,7 +739,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "player_score",
+          "expr": "minecraft_player_score",
           "legendFormat": "{{ player }}",
           "refId": "A"
         }

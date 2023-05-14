@@ -54,39 +54,45 @@ docker run
 # Metrics
 
 ```
-blocks_mined
-blocks_picked_up
-player_deaths
-player_jumps
-cm_traveled
-player_xp_total
-player_current_level
-player_food_level
-player_health
-player_score
-entities_killed
-damage_taken
-damage_dealt
-blocks_crafted
-player_playtime
-player_advancements
-player_slept
-player_used_crafting_table
-player_quests_finished # support for betterquesting
-mc_custom # for 1.15
+minecraft_blocks_mined
+minecraft_blocks_picked_up
+minecraft_player_deaths
+minecraft_player_jumps
+minecraft_cm_traveled
+minecraft_player_xp_total
+minecraft_player_current_level
+minecraft_player_food_level
+minecraft_player_health
+minecraft_player_score
+minecraft_entities_killed
+minecraft_damage_taken
+minecraft_damage_dealt
+minecraft_blocks_crafted
+minecraft_player_playtime
+minecraft_player_advancements
+minecraft_player_slept
+minecraft_player_used_crafting_table
+minecraft_player_quests_finished # support for betterquesting
+minecraft_custom # for 1.15
 ```
 
 The following Metrics are only exported if RCON is configured:
 
 ```
-dim_tps
-dim_ticktime
-overall_tps
-overall_ticktime
-player_online
+minecraft_player_online
 ```
 
-The following Metrics are exposed if Dynmap Support is enabled:
+The following Metrics are exposed if FORGE_SERVER is enabled and RCON is configured:
+
+```
+forge_dim_tps
+forge_dim_ticktime
+forge_overall_tps
+forge_overall_ticktime
+forge_entities
+```
+
+The following Metrics are exposed if Dynmap Support is enabled and RCON is configured:
 
 ```
 dynmap_tile_render_statistics
@@ -94,11 +100,11 @@ dynmap_chunk_loading_statistics_count
 dynmap_chunk_loading_statistics_duration
 ```
 
-The following Metrics are exposed if PAPER_SERVER is enabled:
+The following Metrics are exposed if PAPER_SERVER is enabled and RCON is configured:
 ```
-tps_1m
-tps_5m
-tps_15m
+paper_tps_1m
+paper_tps_5m
+paper_tps_15m
 
 ```
 
