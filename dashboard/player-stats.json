@@ -95,7 +95,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(blocks_mined{player=\"$player\"}) by (block)",
+          "expr": "sum(minecraft_blocks_mined{player=\"$player\"}) by (block)",
           "legendFormat": "{{block}}",
           "refId": "A"
         }
@@ -181,7 +181,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(blocks_crafted{player=\"$player\"}) by (block)",
+          "expr": "sum(minecraft_blocks_crafted{player=\"$player\"}) by (block)",
           "legendFormat": "{{block}}",
           "refId": "A"
         }
@@ -267,7 +267,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(blocks_picked_up{player=\"$player\"}) by (block)",
+          "expr": "sum(minecraft_blocks_picked_up{player=\"$player\"}) by (block)",
           "legendFormat": "{{block}}",
           "refId": "A"
         }
@@ -377,7 +377,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(player_deaths{player=\"$player\"})",
+          "expr": "sum(minecraft_player_deaths{player=\"$player\"})",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -462,7 +462,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "player_jumps{player=\"$player\"}",
+          "expr": "minecraft_player_jumps{player=\"$player\"}",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -523,7 +523,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "cm_traveled{player=\"$player\"} / 1000",
+          "expr": "minecraft_cm_traveled{player=\"$player\"} / 1000",
           "legendFormat": "{{  method }}",
           "refId": "A"
         }
@@ -609,7 +609,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "entities_killed{player=\"$player\"}",
+          "expr": "minecraft_entities_killed{player=\"$player\"}",
           "legendFormat": "{{ entity }}",
           "refId": "A"
         }
@@ -666,14 +666,14 @@
         "allValue": null,
         "current": {},
         "datasource": "${DS_PROMETHEUS}",
-        "definition": "label_values(blocks_mined,player)",
+        "definition": "label_values(minecraft_blocks_mined,player)",
         "hide": 0,
         "includeAll": false,
         "label": null,
         "multi": false,
         "name": "player",
         "options": [],
-        "query": "label_values(blocks_mined,player)",
+        "query": "label_values(minecraft_blocks_mined,player)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
