@@ -47,6 +47,7 @@ docker run -e RCON_HOST=127.0.0.1 \
 	   -e DYNMAP_ENABLED="True" \
 	   -p 8000:8000 \
 	   -v /opt/all_the_mods_3/world:/world \
+	   -v /opt/all_the_mods_3/usercache.json:/usercache.json \
 	   joshi425/minecraft_exporter
 ```
 
