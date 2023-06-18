@@ -66,7 +66,7 @@ class MinecraftCollector(object):
                 player = self.uuid_to_player_mojang(uuid)
             return player
     
-    def Rcon_connect(self):
+    def rcon_connect(self):
         try:
             self.rcon.connect()
             self.rcon_connected = True
