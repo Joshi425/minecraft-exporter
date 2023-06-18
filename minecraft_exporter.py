@@ -52,7 +52,6 @@ class MinecraftCollector(object):
     def uuid_to_player_mojang(self, uuid):
         try:
             result = requests.get('https://sessionserver.mojang.com/session/minecraft/profile/' + uuid)
-            self.player_map[uuid] = result.json()['name']
             return (result.json()['name'])
         except:
             return
@@ -64,6 +63,7 @@ class MinecraftCollector(object):
             player = self.uuid_to_player_usercache(uuid)
             if not player:
                 player = self.uuid_to_player_mojang(uuid)
+            self.player_map[uuid] = player
             return player
     
     def rcon_connect(self):
