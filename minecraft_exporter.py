@@ -18,6 +18,7 @@ class MinecraftCollector(object):
         self.player_directory = "/world/playerdata"
         self.advancements_directory = "/world/advancements"
         self.better_questing = "/world/betterquesting"
+        self.usercache_file = "/usercache.json"
         self.player_map = dict()
         self.quests_enabled = False
 
@@ -39,17 +40,32 @@ class MinecraftCollector(object):
         print("flushing playername cache")
         self.player_map = dict()
 
+    def uuid_to_player_usercache(self, uuid):
+        with open(self.usercache_file) as json_file:
+            data = json.load(json_file)
+            json_file.close()
+        for user in data:
+            if user["uuid"] == uuid:
+                return user["name"]
+        return
+
+    def uuid_to_player_mojang(self, uuid):
+        try:
+            result = requests.get('https://sessionserver.mojang.com/session/minecraft/profile/' + uuid)
+            return (result.json()['name'])
+        except:
+            return
+        
     def uuid_to_player(self, uuid):
         if uuid in self.player_map:
             return self.player_map[uuid]
         else:
-            try:
-                result = requests.get('https://sessionserver.mojang.com/session/minecraft/profile/' + uuid)
-                self.player_map[uuid] = result.json()['name']
-                return (result.json()['name'])
-            except:
-                return
-
+            player = self.uuid_to_player_usercache(uuid)
+            if not player:
+                player = self.uuid_to_player_mojang(uuid)
+            self.player_map[uuid] = player
+            return player
+    
     def rcon_connect(self):
         try:
             self.rcon.connect()
