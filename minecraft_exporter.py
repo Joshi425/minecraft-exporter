@@ -33,6 +33,8 @@ class MinecraftCollector(object):
         schedule.every().day.at("01:00").do(self.flush_playernamecache)
 
     def get_players(self):
+        if self.rcon is None or (not self.rcon_connected and not self.rcon_connect()):
+            return []
         return [f[:-5] for f in listdir(self.stats_directory) if isfile(join(self.stats_directory, f))]
 
     def flush_playernamecache(self):
