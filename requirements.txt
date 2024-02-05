@@ -1,4 +1,4 @@
-mcrcon==0.7.0
+mcipc==2.4.2
 NBT==1.5.1
 prometheus-client==0.12.0
 requests==2.27.1

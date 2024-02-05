@@ -8,7 +8,7 @@ from os.path import isfile, join
 import nbt
 import requests
 import schedule
-from mcrcon import MCRcon, MCRconException
+from mcipc.rcon.je import Client
 from prometheus_client import Metric, REGISTRY, start_http_server
 
 
@@ -24,7 +24,7 @@ class MinecraftCollector(object):
         self.rcon = None
         self.rcon_connected = False
         if all(x in os.environ for x in ['RCON_HOST', 'RCON_PASSWORD']):
-            self.rcon = MCRcon(os.environ['RCON_HOST'], os.environ['RCON_PASSWORD'], port=int(os.environ['RCON_PORT']))
+            self.rcon = Client(os.environ['RCON_HOST'], int(os.environ['RCON_PORT']),passwd=os.environ['RCON_PASSWORD'])
             print("RCON is enabled for " + os.environ['RCON_HOST'])
 
         if os.path.isdir(self.better_questing):
@@ -52,7 +52,7 @@ class MinecraftCollector(object):
 
     def rcon_connect(self):
         try:
-            self.rcon.connect()
+            self.rcon.__enter__() # https://github.com/conqp/mcipc/issues/16
             self.rcon_connected = True
             print("Successfully connected to RCON")
             return True
@@ -62,19 +62,19 @@ class MinecraftCollector(object):
         return False
 
     def rcon_disconnect(self):
-        self.rcon.disconnect()
+        self.rcon.close()
         self.rcon_connected = False
 
     def rcon_command(self, command):
         try:
-            response = self.rcon.command(command)
-        except MCRconException as e:
+            response = self.rcon.run(command)
+        except Exception as e:
             response = None
             if e == "Connection timeout error":
                 print("Lost RCON Connection")
                 self.rcon_disconnect()
             else:
-                print("RCON command failed")
+                print("RCON command failed:",e)
         except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
             print("Lost RCON Connection")
             self.rcon_disconnect()
@@ -110,7 +110,7 @@ class MinecraftCollector(object):
         if 'FORGE_SERVER' in os.environ and os.environ['FORGE_SERVER'] == "True":
             # dimensions
             resp = self.rcon_command("forge tps")
-            dimtpsregex = re.compile("Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)")
+            dimtpsregex = re.compile("Dim (.*?)\s\((.*?)\):\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)")
             for dimid, dimname, meanticktime, meantps in dimtpsregex.findall(resp):
                 dim_tps.add_sample('dim_tps', value=meantps, labels={'dimension_id': dimid, 'dimension_name': dimname})
                 dim_ticktime.add_sample('dim_ticktime', value=meanticktime,
@@ -381,9 +381,5 @@ if __name__ == '__main__':
     print(f'Exporter started on Port {HTTP_PORT}')
 
     while True:
-        try:
             time.sleep(1)
             schedule.run_pending()
-        except MCRconException:
-            # RCON timeout
-            collector.rcon_disconnect()
