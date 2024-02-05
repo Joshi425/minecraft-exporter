@@ -6,8 +6,8 @@ This exporter reads minecrafts nbt files, the advancements files and can optiona
 
 To use it mount your world to /world in the container
 
-RCON connection is used to get online Players   
-On Forge Servers enable FORGE_SERVER to get tps information   
+RCON connection is used to get online Players
+On Forge Servers enable FORGE_SERVER to get tps information
 On Paper Servers enable PAPER_SERVER to get tps information
 
 To enable rcon on your minecraft server add the following to the server.properties file:
@@ -39,53 +39,60 @@ enable-rcon=true
 # Usage
 
 ```
-docker run -e RCON_HOST=127.0.0.1 \
-	   -e RCON_PORT=25575 \
-	   -e RCON_PASSWORD="Password" \
-	   -e FORGE_SERVER="True" \
-	   -e PAPER_SERVER="True" \
-	   -e DYNMAP_ENABLED="True" \
-	   -p 8000:8000 \
-	   -v /opt/all_the_mods_3/world:/world \
-	   joshi425/minecraft_exporter
+docker run
+       -e RCON_HOST=127.0.0.1                                  \
+       -e RCON_PORT=25575                                      \
+       -e RCON_PASSWORD="Password"                             \
+       -e FORGE_SERVER="true"                                  \
+       -e PAPER_SERVER="true"                                  \
+       -e DYNMAP_ENABLED="true"                                \
+       -p 8000:8000                                            \
+       -v /path/to/minecraft/world:/world                      \
+       ghcr.io/Joshi425/minecraft-exporter:latest
 ```
 
 # Metrics
 
 ```
-blocks_mined
-blocks_picked_up
-player_deaths
-player_jumps
-cm_traveled
-player_xp_total
-player_current_level
-player_food_level
-player_health
-player_score
-entities_killed
-damage_taken
-damage_dealt
-blocks_crafted
-player_playtime
-player_advancements
-player_slept
-player_used_crafting_table
-player_quests_finished # support for betterquesting
-mc_custom # for 1.15
+minecraft_blocks_mined
+minecraft_blocks_picked_up
+minecraft_player_deaths
+minecraft_player_jumps
+minecraft_cm_traveled
+minecraft_player_xp_total
+minecraft_player_current_level
+minecraft_player_food_level
+minecraft_player_health
+minecraft_player_score
+minecraft_entities_killed
+minecraft_damage_taken
+minecraft_damage_dealt
+minecraft_blocks_crafted
+minecraft_player_playtime
+minecraft_player_advancements
+minecraft_player_slept
+minecraft_player_used_crafting_table
+minecraft_player_quests_finished # support for betterquesting
+minecraft_custom # for 1.15
 ```
 
 The following Metrics are only exported if RCON is configured:
 
 ```
-dim_tps
-dim_ticktime
-overall_tps
-overall_ticktime
-player_online
+minecraft_player_online
 ```
 
-The following Metrics are exposed if Dynmap Support is enabled:
+The following Metrics are exposed if FORGE_SERVER is enabled and RCON is configured:
+
+```
+forge_dim_tps
+forge_dim_ticktime
+forge_overall_tps
+forge_overall_ticktime
+forge_entities
+```
+
+The following Metrics are exposed if Dynmap Support is enabled and RCON is configured:
 
 ```
 dynmap_tile_render_statistics
@@ -93,18 +100,18 @@ dynmap_chunk_loading_statistics_count
 dynmap_chunk_loading_statistics_duration
 ```
 
-The following Metrics are exposed if PAPER_SERVER is enabled:
+The following Metrics are exposed if PAPER_SERVER is enabled and RCON is configured:
 ```
-tps_1m 
-tps_5m 
-tps_15m
+paper_tps_1m
+paper_tps_5m
+paper_tps_15m
 
 ```
 
 # Dashboards
 
-In the folder dashboards you'll find grafana dashboards for these metrics, they are however incomplete and can be expanded 
+In the folder dashboards you'll find grafana dashboards for these metrics, they are however incomplete and can be expanded
 or use the following dasboards:
 
-https://grafana.com/grafana/dashboards/11993  
+https://grafana.com/grafana/dashboards/11993
 https://grafana.com/grafana/dashboards/11994

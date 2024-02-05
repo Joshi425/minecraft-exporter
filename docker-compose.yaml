@@ -4,7 +4,7 @@ services:
     build:
       context: .
     environment:
-      RCON_HOST: 
+      RCON_HOST:
       RCON_PORT:
       RCON_PASSWORD:
     ports:
