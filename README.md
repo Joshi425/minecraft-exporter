@@ -25,12 +25,13 @@ enable-rcon=true
 
 # Environment Variables
 
-| Name          | Default | Description                                       |
-| ------------- | ------- | ------------------------------------------------- |
-| RCON_HOST     | `None`  | Host of the RCON server                           |
-| RCON_PORT     | `None`  | Port RCON is hosted on                            |
-| RCON_PASSWORD | `None`  | RCON Password for access                          |
-| HTTP_PORT     | `8000`  | Port to host on, in case of using outside docker* |
+| Name            | Default  | Description                                       |
+| --------------- | -------- | ------------------------------------------------- |
+| RCON_HOST       | `None`   | Host of the RCON server                           |
+| RCON_PORT       | `None`   | Port RCON is hosted on                            |
+| RCON_PASSWORD   | `None`   | RCON Password for access                          |
+| HTTP_PORT       | `8000`   | Port to host on, in case of using outside docker* |
+| WORLD_DIRECTORY | `/world` | Directory of the world for player stats           |
 
 > * Or other cases where you have limited control of port mappings, eg Pterodactyl.
 
