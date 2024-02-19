@@ -33,6 +33,8 @@ class MinecraftCollector(object):
         schedule.every().day.at("01:00").do(self.flush_playernamecache)
 
     def get_players(self):
+        if not os.path.isdir(self.stats_directory):
+            return []
         return [f[:-5] for f in listdir(self.stats_directory) if isfile(join(self.stats_directory, f))]
 
     def flush_playernamecache(self):
